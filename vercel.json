@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/_blob/:id", "destination": "/api/app?photo=:id" }
+  ]
+}
