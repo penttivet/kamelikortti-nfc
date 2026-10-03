@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kamelikortti</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐪</text></svg>">
+<style>
+  :root {
+    --sand: #EDE3CF;
+    --dune: #C9A86A;
+    --ink: #2B2620;
+    --muted: #6E6250;
+    --btn: #3F5B4A;
+    --btn-text: #F7F3EA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --sand: #1E1B16; --dune: #8A7348; --ink: #EFE7D6; --muted: #B3A68E; --btn: #6F9A80; --btn-text: #14120E; }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--sand);
+    color: var(--ink);
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: env(safe-area-inset-top, 0px) 24px env(safe-area-inset-bottom, 0px);
+  }
+  main { width: 100%; max-width: 360px; text-align: center; }
+  .camel { font-size: 64px; line-height: 1; }
+  h1 { font-size: 28px; font-weight: 700; margin: 16px 0 4px; letter-spacing: -0.01em; }
+  .code { font-size: 18px; color: var(--muted); margin: 0 0 28px; }
+  a.btn {
+    display: block; padding: 18px; border-radius: 14px;
+    background: var(--btn); color: var(--btn-text);
+    font-size: 19px; font-weight: 600; text-decoration: none;
+  }
+  a.btn:focus-visible { outline: 3px solid var(--dune); outline-offset: 3px; }
+  p.note { font-size: 15px; color: var(--muted); line-height: 1.5; margin-top: 20px; }
+  .err { color: #A3412F; }
+</style>
+</head>
+<body>
+<main>
+  <div class="camel" aria-hidden="true">🐪</div>
+  <h1>Kamelikortti</h1>
+  <p class="code" id="code"></p>
+  <a class="btn" id="open" href="#">Open camel card in Chrome</a>
+  <p class="note" id="note">Opening Chrome… If nothing happens, tap the button.</p>
+</main>
+<script>
+  // Artifact address (change only if the artifact link changes)
+  var ARTIFACT = "claude.ai/artifact/XakEHPZYxAmZ2Mq5G3k262";
+
+  // Read the tag code from:  /#camel001   /#/k/camel001   /?k=camel001
+  function getCode() {
+    var q = new URLSearchParams(location.search).get("k");
+    if (q) return q.trim();
+    var h = decodeURIComponent(location.hash.replace(/^#/, ""));
+    h = h.replace(/^\/?k\//, "").replace(/^\//, "");
+    return h.trim();
+  }
+
+  var code = getCode();
+  var codeEl = document.getElementById("code");
+  var btn = document.getElementById("open");
+  var note = document.getElementById("note");
+
+  if (!code) {
+    codeEl.textContent = "No camel code in this tag";
+    codeEl.className = "code err";
+    btn.textContent = "Open Kamelikortti in Chrome";
+    btn.href = "googlechromes://" + ARTIFACT;
+    note.textContent = "The tag link should end with the camel's code, for example #camel001.";
+  } else {
+    codeEl.textContent = code;
+    var target = "googlechromes://" + ARTIFACT + "#/k/" + encodeURIComponent(code);
+    btn.href = target;
+    // Try to open Chrome automatically
+    setTimeout(function () { location.href = target; }, 150);
+    // If Chrome did not open, explain why
+    setTimeout(function () {
+      if (!document.hidden) {
+        note.textContent = "Chrome did not open. Make sure Google Chrome is installed and you are signed in to Claude in Chrome, then tap the button.";
+      }
+    }, 2500);
+  }
+</script>
+</body>
+</html>
