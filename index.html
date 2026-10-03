@@ -1,90 +1,1030 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Kamelikortti</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐪</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐫</text></svg>">
 <style>
-  :root {
-    --sand: #EDE3CF;
-    --dune: #C9A86A;
-    --ink: #2B2620;
-    --muted: #6E6250;
-    --btn: #3F5B4A;
-    --btn-text: #F7F3EA;
+  :root{
+    --sand:#ECE3D0; --ink:#33291F; --oasis:#2C6B66; --oasis-dark:#1F4E4A;
+    --card:#FBF8F1; --line:#e3d9c3; --muted:#7a6d59;
+    --ultra:#6B4E8E; --injection:#A8483F; --embryo:#B98A2E; --other:#3E6E9E; --photo:#4E7D4E;
+    --warn:#a8483f;
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --sand: #1E1B16; --dune: #8A7348; --ink: #EFE7D6; --muted: #B3A68E; --btn: #6F9A80; --btn-text: #14120E; }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --sand:#221D16; --ink:#EDE6D6; --card:#2B241A; --line:#463C2C; --muted:#b6a98f;
+    }
   }
-  * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
-  body {
-    background: var(--sand);
-    color: var(--ink);
-    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    padding: env(safe-area-inset-top, 0px) 24px env(safe-area-inset-bottom, 0px);
+  :root[data-theme="dark"]{
+    --sand:#221D16; --ink:#EDE6D6; --card:#2B241A; --line:#463C2C; --muted:#b6a98f;
   }
-  main { width: 100%; max-width: 360px; text-align: center; }
-  .camel { font-size: 64px; line-height: 1; }
-  h1 { font-size: 28px; font-weight: 700; margin: 16px 0 4px; letter-spacing: -0.01em; }
-  .code { font-size: 18px; color: var(--muted); margin: 0 0 28px; }
-  a.btn {
-    display: block; padding: 18px; border-radius: 14px;
-    background: var(--btn); color: var(--btn-text);
-    font-size: 19px; font-weight: 600; text-decoration: none;
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    max-width:560px;margin:0 auto;padding:16px 14px 70px;
+    background:var(--sand);color:var(--ink);line-height:1.45;
   }
-  a.btn:focus-visible { outline: 3px solid var(--dune); outline-offset: 3px; }
-  p.note { font-size: 15px; color: var(--muted); line-height: 1.5; margin-top: 20px; }
-  .err { color: #A3412F; }
+  h1{font-size:1.4rem;margin:6px 0 2px}
+  h2{font-size:1.05rem;margin:22px 0 8px;color:var(--oasis-dark)}
+  p.meta{color:var(--muted);margin:0 0 10px;font-size:.92rem}
+  a{color:var(--oasis-dark)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+  .grid-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 6px}
+  .big-btn{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 8px;
+    text-decoration:none;color:var(--ink);font-size:.86rem;text-align:center;font-weight:600;
+    min-height:76px;cursor:pointer;
+  }
+  .big-btn .ic{font-size:1.6rem}
+  .big-btn.ultra{border-color:var(--ultra)}
+  .big-btn.injection{border-color:var(--injection)}
+  .big-btn.embryo{border-color:var(--embryo)}
+  .big-btn.other{border-color:var(--other)}
+  .big-btn.photo{border-color:var(--photo)}
+  .big-btn.wide{grid-column:1 / -1;flex-direction:row;min-height:56px}
+  a.button, button.primary{
+    display:inline-block;background:var(--oasis);color:white;border:none;
+    padding:11px 18px;border-radius:8px;text-decoration:none;font-size:.95rem;cursor:pointer;
+  }
+  a.button:hover, button.primary:hover{background:var(--oasis-dark)}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:9px 14px;border-radius:8px;cursor:pointer;font-size:.9rem}
+  button.danger{background:transparent;color:var(--warn);border:1px solid var(--warn);padding:6px 10px;border-radius:6px;font-size:.82rem;cursor:pointer}
+  button.mic{background:var(--card);border:1px solid var(--oasis);color:var(--oasis-dark);border-radius:20px;padding:8px 14px;font-size:.85rem;cursor:pointer}
+  button.mic.rec{background:var(--warn);color:white;border-color:var(--warn)}
+  label{display:block;font-size:.83rem;color:var(--muted);margin-top:12px}
+  input,textarea,select{
+    width:100%;padding:9px;margin-top:4px;border-radius:6px;border:1px solid var(--line);
+    font-size:1rem;background:var(--card);color:var(--ink);
+  }
+  textarea{min-height:70px}
+  .field.suggested input, .field.suggested textarea, .field.suggested select{border-color:var(--embryo);box-shadow:0 0 0 2px rgba(185,138,46,.15)}
+  .row-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .flash{background:#f6dcd8;border:1px solid var(--warn);color:#6e2a22;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:.88rem}
+  .flash.ok{background:#dcefe0;border-color:var(--oasis);color:#1c4a3f}
+  .record{border-left:4px solid var(--other);padding-left:12px;margin-bottom:12px}
+  .record.cat-ultrasound{border-color:var(--ultra)}
+  .record.cat-injection{border-color:var(--injection)}
+  .record.cat-embryo{border-color:var(--embryo)}
+  .record.cat-pregnancycheck{border-color:var(--embryo)}
+  .record.cat-photo{border-color:var(--photo)}
+  .record .label{font-weight:700;display:block;margin-bottom:4px}
+  .record.cat-flush{border-color:var(--embryo)}
+  .big-btn.flush{border-color:var(--embryo)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center}
+  .stat .n{font-size:1.45rem;font-weight:700;color:var(--oasis-dark);display:block;line-height:1.2}
+  .stat .t{font-size:.74rem;color:var(--muted)}
+  .stat.hl{border-color:var(--embryo);border-width:2px}
+  .stat.hl .n{color:var(--embryo)}
+  .tbl-wrap{overflow-x:auto}
+  table.tbl{width:100%;border-collapse:collapse;font-size:.85rem}
+  table.tbl th,table.tbl td{padding:6px 5px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  table.tbl th:first-child,table.tbl td:first-child{text-align:left}
+  table.tbl th{color:var(--muted);font-weight:600}
+  .st-preg{color:var(--oasis-dark);font-weight:700}
+  .st-open{color:var(--warn);font-weight:700}
+  .st-pend{color:var(--muted)}
+  .record small{color:var(--muted);display:block;margin-top:4px}
+  .record .kv{margin:2px 0;font-size:.92rem}
+  .record .kv b{color:var(--muted);font-weight:600}
+  .backlink{display:inline-block;margin-bottom:10px;font-size:.9rem}
+  .top-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .top-nav .icon-link{font-size:1.3rem;text-decoration:none}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .filters button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:5px 12px;font-size:.8rem;cursor:pointer}
+  .filters button.active{background:var(--oasis);color:white;border-color:var(--oasis)}
+  .due-item{display:flex;justify-content:space-between;align-items:center}
+  .due-item.overdue{color:var(--warn);font-weight:600}
+  .photo-thumb{max-width:100%;border-radius:8px;margin-top:8px;display:block}
+  .empty{color:var(--muted);font-size:.92rem}
+  .hint{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .badge{display:inline-block;background:var(--line);color:var(--ink);border-radius:10px;padding:2px 8px;font-size:.75rem;margin-left:6px}
+  #notify{position:fixed;left:0;right:0;top:0;z-index:1000;display:none;padding:10px 14px;font-size:.9rem;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+  #notify.show{display:block}
+  #notify.err{background:#f6dcd8;color:#6e2a22;border-bottom:1px solid var(--warn)}
+  #notify.ok{background:#dcefe0;color:#1c4a3f;border-bottom:1px solid var(--oasis)}
 </style>
 </head>
 <body>
-<main>
-  <div class="camel" aria-hidden="true">🐪</div>
-  <h1>Kamelikortti</h1>
-  <p class="code" id="code"></p>
-  <a class="btn" id="open" href="#">Open camel card in Chrome</a>
-  <p class="note" id="note">Opening Chrome… If nothing happens, tap the button.</p>
-</main>
+<div id="notify"></div>
+<div id="whoami" style="font-size:.78rem;color:var(--muted);text-align:right;margin-bottom:6px"></div>
+<div id="app">Loading…</div>
+
 <script>
-  // Artifact address (change only if the artifact link changes)
-  var ARTIFACT = "claude.ai/artifact/XakEHPZYxAmZ2Mq5G3k262";
+(function(){
+"use strict";
 
-  // Read the tag code from:  /#camel001   /#/k/camel001   /?k=camel001
-  function getCode() {
-    var q = new URLSearchParams(location.search).get("k");
-    if (q) return q.trim();
-    var h = decodeURIComponent(location.hash.replace(/^#/, ""));
-    h = h.replace(/^\/?k\//, "").replace(/^\//, "");
-    return h.trim();
+// ---------- schema ----------
+var CATEGORY_LABEL = {
+  ultrasound: "Ultrasound examination",
+  injection: "Injection / medication",
+  embryo: "Embryo transfer",
+  pregnancycheck: "Pregnancy check",
+  flush: "Flush / OPU",
+  other: "Other note",
+  photo: "Photo"
+};
+var CATEGORY_ICON = {
+  ultrasound: "🩻", injection: "💉", embryo: "🧬",
+  pregnancycheck: "🤰", flush: "🥚", other: "📋", photo: "📷"
+};
+
+var FIELD_SCHEMAS = {
+  ultrasound: [
+    {key:"datetime", label:"Date and time", type:"datetime-local", required:true},
+    {key:"vet", label:"Veterinarian", type:"text"},
+    {key:"leftOvary", label:"Left ovary", type:"text"},
+    {key:"rightOvary", label:"Right ovary", type:"text"},
+    {key:"uterusFindings", label:"Uterine findings", type:"text"},
+    {key:"uterusFluid", label:"Uterine fluid", type:"text"},
+    {key:"pregnancyAge", label:"Pregnancy age", type:"text"},
+    {key:"fetalFindings", label:"Fetal findings", type:"text"},
+    {key:"statement", label:"Free-text statement", type:"textarea", voice:true},
+    {key:"nextExamDate", label:"Next exam date", type:"date", due:"Next ultrasound"}
+  ],
+  injection: [
+    {key:"datetime", label:"Time given", type:"datetime-local", required:true},
+    {key:"drug", label:"Drug", type:"select", options:["GnRH","hCG","Progesterone","Prostaglandin (PGF2α)","Oxytocin","Antibiotic","Anti-inflammatory","Other"]},
+    {key:"dose", label:"Dose", type:"text"},
+    {key:"route", label:"Route", type:"select", options:["IM (intramuscular)","IV (intravenous)","SC (subcutaneous)","IU (intrauterine)","Other"]},
+    {key:"administrator", label:"Given by", type:"text"},
+    {key:"nextDose", label:"Next dose", type:"datetime-local", due:"drug"},
+    {key:"adverseEffect", label:"Possible adverse effect", type:"textarea", voice:true}
+  ],
+  embryo: [
+    {key:"date", label:"Date", type:"date", required:true},
+    {key:"donor", label:"Donor", type:"text"},
+    {key:"recipient", label:"Recipient", type:"text"},
+    {key:"hormoneTreatment", label:"Hormone treatments", type:"text"},
+    {key:"ovulationTime", label:"Ovulation time", type:"datetime-local"},
+    {key:"flushDay", label:"Flush day", type:"date"},
+    {key:"embryoCount", label:"Number of embryos", type:"text"},
+    {key:"embryoGrading", label:"Embryo grading", type:"text"},
+    {key:"embryoType", label:"Type", type:"select", options:["Fresh","Frozen","Vitrified"]},
+    {key:"transferDate", label:"Transfer date", type:"date"},
+    {key:"transferredBy", label:"Transferred by", type:"text"},
+    {key:"recipientCL", label:"Recipient's CL", type:"text"},
+    {key:"nextCheckDate", label:"Next pregnancy check", type:"date", due:"Next pregnancy check"},
+    {key:"outcome", label:"Outcome", type:"textarea", voice:true}
+  ],
+  pregnancycheck: [
+    {key:"date", label:"Date", type:"date", required:true},
+    {key:"vet", label:"Veterinarian", type:"text"},
+    {key:"result", label:"Result", type:"select", options:["Pregnant","Not pregnant","Uncertain"]},
+    {key:"age", label:"Pregnancy age", type:"text"},
+    {key:"notes", label:"Notes", type:"textarea", voice:true},
+    {key:"nextCheckDate", label:"Next check", type:"date", due:"Next pregnancy check"}
+  ],
+  flush: [
+    {key:"date", label:"Date", type:"date", required:true},
+    {key:"vet", label:"Veterinarian", type:"text"},
+    {key:"procedure", label:"Procedure", type:"select", options:["Flush","OPU","IVF"]},
+    {key:"embryosRecovered", label:"Embryos recovered", type:"number"},
+    {key:"unfertilized", label:"Unfertilized oocytes", type:"number"},
+    {key:"degenerated", label:"Degenerated embryos", type:"number"},
+    {key:"transferredFresh", label:"Transferred fresh", type:"number"},
+    {key:"frozen", label:"Frozen / vitrified", type:"number"},
+    {key:"recipients", label:"Recipients", type:"text"},
+    {key:"notes", label:"Notes", type:"textarea", voice:true}
+  ],
+  other: [
+    {key:"date", label:"Date", type:"date", required:true},
+    {key:"subtype", label:"Type", type:"select", options:["Blood test / lab result","Vaccination","Diagnosis","Treatment plan","Competition / training","Other"]},
+    {key:"value", label:"Result / description", type:"text"},
+    {key:"notes", label:"Additional notes", type:"textarea", voice:true}
+  ]
+};
+
+var PROFILE_FIELDS = [
+  {key:"name", label:"Name", type:"text", required:true},
+  {key:"owner", label:"Owner", type:"text"},
+  {key:"sex", label:"Sex", type:"select", options:["Male","Female"]},
+  {key:"birthdate", label:"Date of birth", type:"date"},
+  {key:"microchip", label:"Official microchip number", type:"text"},
+  {key:"nfcTag", label:"NFC tag ID", type:"text"},
+  {key:"stall", label:"Barn", type:"text"},
+  {key:"pen", label:"Stall / pen", type:"text"},
+  {key:"camelType", label:"Type", type:"select", options:["Donor","Recipient","Racing camel","Other"]}
+];
+
+// ---------- state ----------
+var db = null, sample = null, assets = null, userCap = null;
+var app = document.getElementById("app");
+var canWrite = true; // resolved from user capability when available
+
+// ---------- helpers ----------
+function h(str){ var d=document.createElement("div"); d.textContent=str==null?"":String(str); return d.innerHTML; }
+function fmtDate(iso){ if(!iso) return ""; try{ var d=new Date(iso); return d.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}); }catch(e){return iso;} }
+function fmtDateTime(iso){ if(!iso) return ""; try{ var d=new Date(iso); return d.toLocaleDateString("en-GB")+" "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }catch(e){return iso;} }
+function cleanTag(t){ return String(t||"").trim().replace(/\s+/g,"").replace(/[^A-Za-z0-9_\-.~:@+]/g,""); }
+function nowIso(){ return new Date().toISOString(); }
+function go(hash){ window.location.hash = hash; }
+function esc(s){ return h(s); }
+var notifyTimer = null;
+function notify(msg, isErr){
+  var el = document.getElementById("notify");
+  if(!el) return;
+  el.textContent = msg + "  ";
+  var closeBtn = document.createElement("button");
+  closeBtn.textContent = "✕";
+  closeBtn.style.cssText = "background:none;border:none;font-size:1rem;cursor:pointer;color:inherit;margin-left:8px";
+  closeBtn.addEventListener("click", function(){ el.classList.remove("show"); });
+  el.appendChild(closeBtn);
+  el.className = "show " + (isErr ? "err" : "ok");
+  if(notifyTimer) clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(function(){ el.classList.remove("show"); }, 7000);
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function flashHtml(msg, ok){
+  return '<div class="flash '+(ok?"ok":"")+'">'+esc(msg)+'</div>';
+}
+
+// ---------- server API (Vercel + Supabase) ----------
+var pinShown = false;
+async function api(action, payload){
+  var r = await fetch("/api/app", {
+    method:"POST", credentials:"same-origin",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(Object.assign({action:action}, payload||{}))
+  });
+  if(r.status === 401){ showPin(); throw new Error("PIN required"); }
+  var j = {};
+  try{ j = await r.json(); }catch(e){}
+  if(!r.ok) throw new Error(j.error || ("Server error " + r.status));
+  return j.result;
+}
+
+function showPin(msg){
+  pinShown = true;
+  var whoami = document.getElementById("whoami");
+  if(whoami) whoami.textContent = "";
+  app.innerHTML = '<div class="card" style="margin-top:40px;text-align:center">'
+    + '<div style="font-size:3rem">🐫</div><h1>Kamelikortti</h1>'
+    + '<p class="meta">Enter the PIN to open camel records.</p>'
+    + '<input id="pinInput" type="password" inputmode="numeric" autocomplete="current-password" style="text-align:center;font-size:1.4rem;letter-spacing:.2em">'
+    + '<div id="pinErr" style="color:var(--warn);min-height:1.4em;margin-top:8px">' + esc(msg||"") + '</div>'
+    + '<button class="primary" id="pinGo" style="width:100%;margin-top:6px">Open</button></div>';
+  var input = document.getElementById("pinInput");
+  var goBtn = document.getElementById("pinGo");
+  async function tryPin(){
+    var pin = input.value.trim();
+    if(!pin){ input.focus(); return; }
+    goBtn.disabled = true; goBtn.textContent = "Checking…";
+    try{
+      var r = await fetch("/api/app", {method:"POST", credentials:"same-origin",
+        headers:{"Content-Type":"application/json"}, body: JSON.stringify({action:"login", pin:pin})});
+      if(r.ok){ pinShown = false; setWho(); render(); return; }
+      var j = {}; try{ j = await r.json(); }catch(e){}
+      showPin(j.error || "Wrong PIN.");
+    }catch(e){
+      showPin("No connection. Check the network and try again.");
+    }
   }
+  goBtn.addEventListener("click", tryPin);
+  input.addEventListener("keydown", function(ev){ if(ev.key === "Enter") tryPin(); });
+  setTimeout(function(){ input.focus(); }, 50);
+}
 
-  var code = getCode();
-  var codeEl = document.getElementById("code");
-  var btn = document.getElementById("open");
-  var note = document.getElementById("note");
+function setWho(){
+  var whoami = document.getElementById("whoami");
+  if(whoami) whoami.innerHTML = 'Unlocked · <a href="#" id="lockBtn">Lock</a>';
+  var lb = document.getElementById("lockBtn");
+  if(lb) lb.addEventListener("click", async function(ev){
+    ev.preventDefault();
+    try{ await fetch("/api/app", {method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body: JSON.stringify({action:"logout"})}); }catch(e){}
+    showPin();
+  });
+}
 
-  if (!code) {
-    codeEl.textContent = "No camel code in this tag";
-    codeEl.className = "code err";
-    btn.textContent = "Open Kamelikortti in Chrome";
-    btn.href = "googlechromes://" + ARTIFACT;
-    note.textContent = "The tag link should end with the camel's code, for example #camel001.";
+function fileToUpload(file){
+  return new Promise(function(resolve, reject){
+    if(!/^image\//.test(file.type || "")){
+      if(file.size > 3*1024*1024){ reject(new Error("The file is too large (max 3 MB for videos). Use a photo or a shorter clip.")); return; }
+      var fr = new FileReader();
+      fr.onload = function(){ resolve({contentType: file.type || "application/octet-stream", base64: String(fr.result).split(",")[1], ext: (file.name.split(".").pop() || "bin").toLowerCase()}); };
+      fr.onerror = function(){ reject(new Error("Could not read the file.")); };
+      fr.readAsDataURL(file);
+      return;
+    }
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function(){
+      var max = 1600, w = img.naturalWidth, ht = img.naturalHeight;
+      var sc = Math.min(1, max / Math.max(w, ht));
+      var c = document.createElement("canvas");
+      c.width = Math.round(w*sc); c.height = Math.round(ht*sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve({contentType:"image/jpeg", base64: c.toDataURL("image/jpeg", 0.82).split(",")[1], ext:"jpg"});
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("Could not read the image.")); };
+    img.src = url;
+  });
+}
+
+async function initCaps(){
+  db = {};
+  sample = { json: function(prompt){ return api("ai", {prompt: prompt}); } };
+  assets = { upload: async function(file){ var f = await fileToUpload(file); return api("upload", f); } };
+}
+
+// ---------- data access ----------
+async function getCamel(tag){ return api("getCamel", {tag: tag}); }
+async function listCamels(){ return api("listCamels"); }
+async function saveCamel(tag, data){
+  data.tag = tag;
+  if(!data.createdAt) data.createdAt = nowIso();
+  data.updatedAt = nowIso();
+  await api("saveCamel", {tag: tag, data: data});
+}
+async function listRecords(tag, category){ return api("listRecords", {tag: tag, category: category || null}); }
+async function addRecord(tag, category, data, extra){
+  var doc = { camelTag: tag, category: category, createdAt: nowIso(), data: data };
+  if(extra) Object.assign(doc, extra);
+  return api("addRecord", {doc: doc});
+}
+async function deleteRecord(id){ await api("deleteRecord", {id: id}); }
+async function listDue(){ return api("listDue"); }
+
+// ---------- computing due info from a field schema ----------
+function computeDue(category, values){
+  var schema = FIELD_SCHEMAS[category] || [];
+  for(var i=0;i<schema.length;i++){
+    var f = schema[i];
+    if(f.due && values[f.key]){
+      var label;
+      if(f.due === "drug"){ label = "Next dose" + (values.drug ? ": "+values.drug : ""); }
+      else { label = f.due; }
+      var dueDate = values[f.key];
+      // normalize date-only to ISO
+      if(dueDate.length === 10) dueDate = dueDate + "T00:00:00";
+      return { dueDate: new Date(dueDate).toISOString(), dueLabel: label };
+    }
+  }
+  return null;
+}
+
+// ---------- rendering: forms ----------
+function renderField(f, value){
+  var id = "f_"+f.key;
+  var req = f.required ? "required" : "";
+  var val = value==null? "" : value;
+  var out = '<div class="field" data-key="'+f.key+'"><label for="'+id+'">'+esc(f.label)+'</label>';
+  if(f.type === "select"){
+    out += '<select id="'+id+'" '+req+'><option value="">—</option>';
+    f.options.forEach(function(opt){
+      out += '<option value="'+esc(opt)+'"'+(val===opt?" selected":"")+'>'+esc(opt)+'</option>';
+    });
+    out += '</select>';
+  } else if(f.type === "textarea"){
+    out += '<textarea id="'+id+'" '+req+'>'+esc(val)+'</textarea>';
+    if(f.voice){
+      out += '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap">'
+           + '<button type="button" class="mic" id="mic_'+f.key+'">🎤 Dictate</button>'
+           + '<button type="button" class="ghost" id="suggest_'+f.key+'">✨ Suggest fields from speech</button>'
+           + '</div><div class="hint" id="michint_'+f.key+'"></div>';
+    }
   } else {
-    codeEl.textContent = code;
-    var target = "googlechromes://" + ARTIFACT + "#/k/" + encodeURIComponent(code);
-    btn.href = target;
-    // Try to open Chrome automatically
-    setTimeout(function () { location.href = target; }, 150);
-    // If Chrome did not open, explain why
-    setTimeout(function () {
-      if (!document.hidden) {
-        note.textContent = "Chrome did not open. Make sure Google Chrome is installed and you are signed in to Claude in Chrome, then tap the button.";
-      }
-    }, 2500);
+    var extraAttr = f.type === "number" ? ' inputmode="numeric" min="0" step="1"' : '';
+    out += '<input id="'+id+'" type="'+f.type+'" value="'+esc(val)+'"'+extraAttr+' '+req+'>';
   }
+  out += '</div>';
+  return out;
+}
+
+function renderForm(schema, values){
+  values = values || {};
+  return schema.map(function(f){ return renderField(f, values[f.key]); }).join("");
+}
+
+function collectForm(schema){
+  var out = {};
+  schema.forEach(function(f){
+    var el = document.getElementById("f_"+f.key);
+    if(el) out[f.key] = el.value.trim();
+  });
+  return out;
+}
+
+function markSuggested(schema, keys){
+  keys.forEach(function(k){
+    var wrap = document.querySelector('.field[data-key="'+k+'"]');
+    if(wrap) wrap.classList.add("suggested");
+  });
+}
+
+// ---------- speech recognition ----------
+var recognition = null;
+function startDictation(targetTextareaId, btn, hintEl){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    hintEl.textContent = "Speech recognition isn't supported in this browser. You can still type the text manually.";
+    return;
+  }
+  if(recognition){ try{ recognition.stop(); }catch(e){} recognition=null; btn.classList.remove("rec"); btn.textContent="🎤 Dictate"; return; }
+  recognition = new SR();
+  recognition.lang = "en-US";
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  var ta = document.getElementById(targetTextareaId);
+  var base = ta.value ? ta.value + " " : "";
+  btn.classList.add("rec"); btn.textContent = "⏹ Stop";
+  hintEl.textContent = "Listening…";
+  recognition.onresult = function(ev){
+    var interim = "", final = "";
+    for(var i=ev.resultIndex;i<ev.results.length;i++){
+      var t = ev.results[i][0].transcript;
+      if(ev.results[i].isFinal) final += t; else interim += t;
+    }
+    if(final) base += final + " ";
+    ta.value = base + interim;
+  };
+  recognition.onerror = function(ev){
+    hintEl.textContent = "Speech recognition stopped (" + ev.error + "). You can keep typing.";
+    btn.classList.remove("rec"); btn.textContent="🎤 Dictate"; recognition=null;
+  };
+  recognition.onend = function(){
+    btn.classList.remove("rec"); btn.textContent="🎤 Dictate";
+    hintEl.textContent = "";
+    recognition = null;
+  };
+  try{ recognition.start(); }catch(e){ hintEl.textContent="Couldn't start the microphone."; }
+}
+
+async function suggestFromTranscript(category, transcript, schema, freeTextKey){
+  if(!sample){
+    notify("AI suggestions aren't available in this view.", true);
+    return;
+  }
+  if(!transcript || transcript.trim().length < 3){
+    notify("Dictate or type a description first.", true);
+    return;
+  }
+  var otherFields = schema.filter(function(f){ return f.key !== freeTextKey; });
+  var fieldDesc = otherFields.map(function(f){
+    var opts = f.options ? (" (one of: " + f.options.join(", ") + ")") : "";
+    return '"'+f.key+'": '+f.label+opts;
+  }).join("; ");
+  var prompt = "You are a veterinary assistant for camel medical records (" + CATEGORY_LABEL[category] + "). "
+    + "The veterinarian dictated this note: \"" + transcript.replace(/"/g,"'") + "\". "
+    + "Extract values for these fields, if mentioned in the text (omit fields that aren't mentioned): "
+    + fieldDesc + ". "
+    + "Reply with ONLY a JSON object whose keys are the field names above and whose values are short strings. Do not add any other keys.";
+  try{
+    var data = await sample.json(prompt, {modelTier:"quick"});
+    var filled = [];
+    Object.keys(data||{}).forEach(function(k){
+      var el = document.getElementById("f_"+k);
+      if(el && data[k]){
+        el.value = data[k];
+        filled.push(k);
+      }
+    });
+    markSuggested(schema, filled);
+    if(filled.length === 0){
+      notify("The AI couldn't find any fields to fill from that text. Fill in the rest manually.", true);
+    }
+  }catch(e){
+    var msg = "The suggestion failed.";
+    if(e && e.code === "not_granted") msg = "AI use wasn't allowed for this page.";
+    else if(e && e.code === "rate_limited") msg = "Too many requests right now — try again shortly.";
+    notify(msg, true);
+  }
+}
+
+function wireVoiceButtons(schema){
+  schema.forEach(function(f){
+    if(!f.voice) return;
+    var micBtn = document.getElementById("mic_"+f.key);
+    var hintEl = document.getElementById("michint_"+f.key);
+    var suggestBtn = document.getElementById("suggest_"+f.key);
+    if(micBtn){
+      micBtn.addEventListener("click", function(){ startDictation("f_"+f.key, micBtn, hintEl); });
+    }
+    if(suggestBtn){
+      suggestBtn.addEventListener("click", function(){
+        var ta = document.getElementById("f_"+f.key);
+        suggestFromTranscript(currentCategory, ta.value, schema, f.key);
+      });
+    }
+  });
+}
+
+var currentCategory = null;
+
+// ---------- views ----------
+async function viewHome(){
+  var camels = await listCamels();
+  var due = await listDue();
+  var html = '<h1>🐫 Camel Records</h1>';
+  html += '<div class="top-nav"><a href="#/embryo" style="font-weight:600">🧬 Embryo program</a><a class="icon-link" href="#/reminders" title="Reminders">🔔'+(due.length?('<span class="badge">'+due.length+'</span>'):'')+'</a></div>';
+  if(camels.length){
+    camels.forEach(function(c){
+      html += '<div class="card"><a href="#/k/'+encodeURIComponent(c.tag)+'"><strong>'+esc(c.name||c.tag)+'</strong></a>'
+        + '<p class="meta">'+esc(c.tag)+(c.camelType? " · "+esc(c.camelType):"")+(c.owner? " · "+esc(c.owner):"")+'</p></div>';
+    });
+  } else {
+    html += '<p class="empty">No camels yet. Scan an NFC tag, or create one manually below.</p>';
+  }
+  html += '<div class="card"><label for="newtag">New camel — tag ID</label><input id="newtag" placeholder="e.g. CAMEL001" autocapitalize="characters">'
+    + '<div class="hint">Letters and numbers only. Spaces are removed, so "Camel 001" becomes Camel001.</div>'
+    + '<div class="row-actions"><button class="primary" id="gonew">Create camel</button></div></div>';
+  app.innerHTML = html;
+  document.getElementById("gonew").addEventListener("click", function(){
+    var t = cleanTag(document.getElementById("newtag").value);
+    if(!t){ notify("Enter a tag ID using letters and numbers, e.g. CAMEL001.", true); return; }
+    go("#/k/"+encodeURIComponent(t)+"/new");
+  });
+}
+
+async function viewReminders(){
+  var due = await listDue();
+  var now = new Date();
+  var html = '<a class="backlink" href="#/">← Camels</a><h1>Upcoming reminders</h1>';
+  if(!due.length){
+    html += '<p class="empty">No upcoming reminders.</p>';
+  } else {
+    due.forEach(function(r){
+      var overdue = new Date(r.dueDate) < now;
+      html += '<div class="card due-item'+(overdue?' overdue':'')+'">'
+        + '<div><strong>'+esc(r.dueLabel||"Reminder")+'</strong><p class="meta" style="margin:2px 0 0">'
+        + '<a href="#/k/'+encodeURIComponent(r.camelTag)+'">'+esc(r.camelTag)+'</a></p></div>'
+        + '<div>'+fmtDateTime(r.dueDate)+'</div></div>';
+    });
+  }
+  app.innerHTML = html;
+}
+
+async function viewNewCamel(tag){
+  var html = '<a class="backlink" href="#/">← Camels</a><h1>New camel</h1><p class="meta">'+esc(tag)+'</p>';
+  html += '<div class="card" id="pform">'+renderForm(PROFILE_FIELDS, {nfcTag: tag})+
+    '<div class="row-actions"><button class="primary" id="save">Create camel</button></div></div>';
+  app.innerHTML = html;
+  document.getElementById("save").addEventListener("click", async function(){
+    var vals = collectForm(PROFILE_FIELDS);
+    if(!vals.name){ notify("Please enter a name.", true); return; }
+    var btn = document.getElementById("save");
+    btn.disabled = true; btn.textContent = "Saving…";
+    try{
+      await saveCamel(tag, vals);
+      notify("Camel created.", false);
+      go("#/k/"+encodeURIComponent(tag));
+    }catch(e){
+      btn.disabled = false; btn.textContent = "Create camel";
+      notify("Save failed: " + (e && e.message ? e.message : String(e)), true);
+    }
+  });
+}
+
+async function viewCamelEdit(tag){
+  var camel = await getCamel(tag);
+  if(!camel){ go("#/k/"+encodeURIComponent(tag)+"/new"); return; }
+  var html = '<a class="backlink" href="#/k/'+encodeURIComponent(tag)+'">← Back</a><h1>Edit: '+esc(camel.name)+'</h1>';
+  html += '<div class="card">'+renderForm(PROFILE_FIELDS, camel);
+  html += '<label>Photo</label><input type="file" id="photoInput" accept="image/*">';
+  if(camel.photoAssetId) html += '<img class="photo-thumb" src="/_blob/'+esc(camel.photoAssetId)+'">';
+  html += '<div class="row-actions"><button class="primary" id="save">Save</button></div></div>';
+  app.innerHTML = html;
+  document.getElementById("save").addEventListener("click", async function(){
+    var vals = collectForm(PROFILE_FIELDS);
+    vals.photoAssetId = camel.photoAssetId;
+    var file = document.getElementById("photoInput").files[0];
+    if(file && assets){
+      try{
+        var res = await assets.upload(file);
+        vals.photoAssetId = res.id;
+      }catch(e){ notify("Could not save the photo: " + (e && e.message ? e.message : String(e)), true); }
+    }
+    var btn = document.getElementById("save");
+    btn.disabled = true; btn.textContent = "Saving…";
+    try{
+      await saveCamel(tag, vals);
+      notify("Saved.", false);
+      go("#/k/"+encodeURIComponent(tag));
+    }catch(e){
+      btn.disabled = false; btn.textContent = "Save";
+      notify("Save failed: " + (e && e.message ? e.message : String(e)), true);
+    }
+  });
+}
+
+function recordSummaryLine(r){
+  var schema = FIELD_SCHEMAS[r.category] || [];
+  var parts = [];
+  schema.forEach(function(f){
+    if(f.type==="textarea") return;
+    var v = r.data[f.key];
+    if(v) parts.push('<span class="kv"><b>'+esc(f.label)+':</b> '+esc(v)+'</span>');
+  });
+  var free = schema.filter(function(f){return f.type==="textarea";});
+  var freeHtml = "";
+  free.forEach(function(f){
+    if(r.data[f.key]) freeHtml += '<p class="kv">'+esc(r.data[f.key])+'</p>';
+  });
+  return parts.join(" &nbsp;·&nbsp; ") + freeHtml;
+}
+
+async function viewCamelHistory(tag, filter){
+  var camel = await getCamel(tag);
+  if(!camel){ go("#/k/"+encodeURIComponent(tag)+"/new"); return; }
+  var records = await listRecords(tag, filter || null);
+  var html = '<a class="backlink" href="#/k/'+encodeURIComponent(tag)+'">← '+esc(camel.name)+'</a><h1>History</h1>';
+  html += '<div class="filters">';
+  html += '<button data-f="" class="'+(!filter?'active':'')+'">All</button>';
+  Object.keys(CATEGORY_LABEL).forEach(function(c){
+    html += '<button data-f="'+c+'" class="'+(filter===c?'active':'')+'">'+CATEGORY_ICON[c]+' '+CATEGORY_LABEL[c]+'</button>';
+  });
+  html += '</div>';
+  if(!records.length){
+    html += '<p class="empty">No records yet.</p>';
+  } else {
+    records.forEach(function(r){
+      html += '<div class="card record cat-'+r.category+'">'
+        + '<span class="label">'+CATEGORY_ICON[r.category]+' '+CATEGORY_LABEL[r.category]+'</span>';
+      if(r.category === "photo" && r.data.assetId){
+        html += '<img class="photo-thumb" src="/_blob/'+esc(r.data.assetId)+'">';
+        if(r.data.caption) html += '<p class="kv">'+esc(r.data.caption)+'</p>';
+      } else {
+        html += recordSummaryLine(r);
+      }
+      html += '<small>'+fmtDateTime(r.createdAt)+'</small>'
+        + '<div class="row-actions"><button class="danger" data-del="'+r._id+'">Delete</button></div>'
+        + '</div>';
+    });
+  }
+  app.innerHTML = html;
+  document.querySelectorAll(".filters button").forEach(function(b){
+    b.addEventListener("click", function(){ go("#/k/"+encodeURIComponent(tag)+"/history/"+b.getAttribute("data-f")); });
+  });
+  document.querySelectorAll("[data-del]").forEach(function(b){
+    b.addEventListener("click", async function(){
+      if(b.getAttribute("data-armed") !== "1"){
+        b.setAttribute("data-armed","1");
+        b.textContent = "Confirm delete?";
+        setTimeout(function(){ b.setAttribute("data-armed","0"); b.textContent = "Delete"; }, 4000);
+        return;
+      }
+      try{ await deleteRecord(b.getAttribute("data-del")); viewCamelHistory(tag, filter); }
+      catch(e){ notify("Couldn't delete (no permission).", true); }
+    });
+  });
+}
+
+async function enhanceEmbryoForm(tag, camel){
+  try{
+    var camels = await listCamels();
+    var dl = document.getElementById("camelNames") || document.createElement("datalist");
+    dl.id = "camelNames";
+    dl.innerHTML = "";
+    camels.forEach(function(c){
+      var opt = document.createElement("option");
+      opt.value = c.name + " (" + c.tag + ")";
+      dl.appendChild(opt);
+    });
+    document.body.appendChild(dl);
+    ["donor","recipient"].forEach(function(k){
+      var el = document.getElementById("f_"+k);
+      if(el) el.setAttribute("list","camelNames");
+    });
+    var role = (camel.camelType||"").toLowerCase();
+    var meLabel = camel.name + " (" + camel.tag + ")";
+    if(role.indexOf("donor")>=0){
+      var d = document.getElementById("f_donor");
+      if(d && !d.value){ d.value = meLabel; markSuggested(FIELD_SCHEMAS.embryo, ["donor"]); }
+    } else if(role.indexOf("recipient")>=0){
+      var r = document.getElementById("f_recipient");
+      if(r && !r.value){ r.value = meLabel; markSuggested(FIELD_SCHEMAS.embryo, ["recipient"]); }
+    }
+  }catch(e){}
+  try{
+    var injections = await listRecords(tag, "injection");
+    if(injections.length){
+      var latest = injections[0];
+      var h = document.getElementById("f_hormoneTreatment");
+      if(h && !h.value){
+        var parts = [];
+        if(latest.data.drug) parts.push(latest.data.drug);
+        if(latest.data.dose) parts.push(latest.data.dose);
+        var summary = parts.join(" ");
+        if(latest.data.datetime) summary += " (" + fmtDateTime(latest.data.datetime) + ")";
+        if(summary.trim()){ h.value = summary.trim(); markSuggested(FIELD_SCHEMAS.embryo, ["hormoneTreatment"]); }
+      }
+    }
+  }catch(e){}
+}
+
+async function viewRecordForm(tag, category){
+  var camel = await getCamel(tag);
+  if(!camel){ go("#/k/"+encodeURIComponent(tag)+"/new"); return; }
+  currentCategory = category;
+  var schema = FIELD_SCHEMAS[category];
+  var html = '<a class="backlink" href="#/k/'+encodeURIComponent(tag)+'">← '+esc(camel.name)+'</a>'
+    + '<h1>'+CATEGORY_ICON[category]+' '+CATEGORY_LABEL[category]+'</h1>';
+  html += '<div class="card" id="rform">'+renderForm(schema, {});
+  html += '<div class="row-actions"><button class="primary" id="save">Save</button></div></div>';
+  app.innerHTML = html;
+  wireVoiceButtons(schema);
+  if(category === "embryo") enhanceEmbryoForm(tag, camel);
+  if(category === "flush") enhanceFlushForm();
+  document.getElementById("save").addEventListener("click", async function(){
+    var vals = collectForm(schema);
+    var req = schema.filter(function(f){return f.required;});
+    for(var i=0;i<req.length;i++){ if(!vals[req[i].key]){ notify(req[i].label+" is required.", true); return; } }
+    var extra = {};
+    var due = computeDue(category, vals);
+    if(due){ extra.dueDate = due.dueDate; extra.dueLabel = due.dueLabel; }
+    try{
+      await addRecord(tag, category, vals, extra);
+      notify("Record saved.", false);
+      go("#/k/"+encodeURIComponent(tag));
+    }catch(e){
+      notify("Couldn't save. Make sure you have edit access.", true);
+    }
+  });
+}
+
+async function viewPhotoForm(tag){
+  var camel = await getCamel(tag);
+  if(!camel){ go("#/k/"+encodeURIComponent(tag)+"/new"); return; }
+  var html = '<a class="backlink" href="#/k/'+encodeURIComponent(tag)+'">← '+esc(camel.name)+'</a><h1>📷 Take photo</h1>';
+  html += '<div class="card">'
+    + '<label>Photo or video</label><input type="file" id="mediaInput" accept="image/*,video/*">'
+    + '<label>Caption</label><textarea id="caption"></textarea>'
+    + '<div class="row-actions"><button class="primary" id="save">Save</button></div></div>';
+  app.innerHTML = html;
+  document.getElementById("save").addEventListener("click", async function(){
+    var file = document.getElementById("mediaInput").files[0];
+    var caption = document.getElementById("caption").value.trim();
+    if(!file){ notify("Choose a photo or video.", true); return; }
+    if(!assets){ notify("File storage isn't available.", true); return; }
+    try{
+      var res = await assets.upload(file);
+      await addRecord(tag, "photo", {assetId: res.id, caption: caption});
+      notify("Photo saved.", false);
+      go("#/k/"+encodeURIComponent(tag));
+    }catch(e){
+      notify("Couldn't save the file (size/format not allowed, or no permission).", true);
+    }
+  });
+}
+
+async function viewCamelDashboard(tag){
+  var camel = await getCamel(tag);
+  if(!camel){ go("#/k/"+encodeURIComponent(tag)+"/new"); return; }
+  var records = await listRecords(tag, null);
+  var recent = records.slice(0,4);
+  var html = '<a class="backlink" href="#/">← Camels</a>';
+  html += '<div class="top-nav"><h1>'+esc(camel.name)+'</h1><a class="icon-link" href="#/k/'+encodeURIComponent(tag)+'/edit">✏️</a></div>';
+  var metaBits = [camel.tag];
+  if(camel.camelType) metaBits.push(camel.camelType);
+  if(camel.owner) metaBits.push(camel.owner);
+  if(camel.sex) metaBits.push(camel.sex);
+  if(camel.stall || camel.pen) metaBits.push([camel.stall,camel.pen].filter(Boolean).join(" / "));
+  html += '<p class="meta">'+metaBits.map(esc).join(" · ")+'</p>';
+  if(camel.photoAssetId) html += '<img class="photo-thumb" src="/_blob/'+esc(camel.photoAssetId)+'">';
+
+  html += '<div class="grid-buttons">'
+    + '<a class="big-btn ultra" href="#/k/'+encodeURIComponent(tag)+'/f/ultrasound"><span class="ic">🩻</span>New ultrasound</a>'
+    + '<a class="big-btn injection" href="#/k/'+encodeURIComponent(tag)+'/f/injection"><span class="ic">💉</span>Give injection</a>'
+    + '<a class="big-btn other" href="#/k/'+encodeURIComponent(tag)+'/f/other"><span class="ic">📋</span>Add treatment</a>'
+    + '<a class="big-btn embryo" href="#/k/'+encodeURIComponent(tag)+'/f/embryo"><span class="ic">🧬</span>Embryo transfer</a>'
+    + '<a class="big-btn embryo" href="#/k/'+encodeURIComponent(tag)+'/f/pregnancycheck"><span class="ic">🤰</span>Pregnancy check</a>'
+    + '<a class="big-btn flush" href="#/k/'+encodeURIComponent(tag)+'/f/flush"><span class="ic">🥚</span>Flush / OPU</a>'
+    + '<a class="big-btn photo" href="#/k/'+encodeURIComponent(tag)+'/photo"><span class="ic">📷</span>Take photo</a>'
+    + '<a class="big-btn wide" href="#/embryo"><span class="ic">🧬</span>&nbsp; Embryo program</a>'
+    + '<a class="big-btn wide" href="#/k/'+encodeURIComponent(tag)+'/history"><span class="ic">📖</span>&nbsp; View history</a>'
+    + '</div>';
+
+  html += '<h2>Recent records</h2>';
+  if(!recent.length){
+    html += '<p class="empty">No records yet.</p>';
+  } else {
+    recent.forEach(function(r){
+      html += '<div class="card record cat-'+r.category+'"><span class="label">'+CATEGORY_ICON[r.category]+' '+CATEGORY_LABEL[r.category]+'</span>';
+      if(r.category === "photo" && r.data.assetId){
+        html += '<img class="photo-thumb" src="/_blob/'+esc(r.data.assetId)+'">';
+      } else {
+        html += recordSummaryLine(r);
+      }
+      html += '<small>'+fmtDateTime(r.createdAt)+'</small></div>';
+    });
+  }
+  app.innerHTML = html;
+}
+
+// ---------- embryo program ----------
+async function enhanceFlushForm(){
+  try{
+    var camels = await listCamels();
+    var dl = document.getElementById("camelNames") || document.createElement("datalist");
+    dl.id = "camelNames"; dl.innerHTML = "";
+    camels.forEach(function(c){
+      var o = document.createElement("option"); o.value = c.name + " (" + c.tag + ")"; dl.appendChild(o);
+    });
+    document.body.appendChild(dl);
+    var el = document.getElementById("f_recipients");
+    if(el){ el.setAttribute("list","camelNames"); el.placeholder = "e.g. Name (TAG), Name (TAG)"; }
+  }catch(e){}
+}
+
+async function listByCategory(cat){ return api("listByCategory", {cat: cat}); }
+function num(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function tagFromText(t){ var m = /\(([^)]+)\)\s*$/.exec(t||""); return m ? m[1].trim() : null; }
+function dayOf(v){ return v ? String(v).slice(0,10) : ""; }
+function pct(a,b){ return b ? Math.round(a*100/b) + " %" : "–"; }
+
+var PERIODS = [
+  {key:"all", label:"All time"},
+  {key:"12m", label:"Last 12 months"},
+  {key:"year", label:"This year"},
+  {key:"90d", label:"Last 90 days"}
+];
+function periodStart(key){
+  var d = new Date();
+  if(key === "12m"){ d.setFullYear(d.getFullYear()-1); return d.toISOString().slice(0,10); }
+  if(key === "90d"){ d.setDate(d.getDate()-90); return d.toISOString().slice(0,10); }
+  if(key === "year"){ return d.getFullYear() + "-01-01"; }
+  return "";
+}
+
+async function viewEmbryoDashboard(period){
+  period = period || "all";
+  var res = await Promise.all([listByCategory("flush"), listByCategory("embryo"), listByCategory("pregnancycheck"), listCamels()]);
+  var flushes = res[0], transfers = res[1], checks = res[2], camels = res[3];
+  var nameOf = {};
+  camels.forEach(function(c){ nameOf[c.tag] = c.name || c.tag; });
+  var from = periodStart(period);
+  var inRange = function(d){ return !from || (d && d >= from); };
+
+  flushes = flushes.filter(function(r){ return inRange(dayOf(r.data.date)); })
+    .sort(function(a,b){ return dayOf(b.data.date).localeCompare(dayOf(a.data.date)); });
+  transfers = transfers.map(function(r){
+    var d = dayOf(r.data.transferDate || r.data.date);
+    var rec = tagFromText(r.data.recipient) || r.camelTag;
+    return {r:r, date:d, recipient:rec};
+  }).filter(function(t){ return inRange(t.date); })
+    .sort(function(a,b){ return b.date.localeCompare(a.date); });
+
+  // totals
+  var T = {flush:0, opu:0, ivf:0, rec:0, unf:0, deg:0, fresh:0, frozen:0};
+  var donors = {};
+  flushes.forEach(function(r){
+    var d = r.data, p = (d.procedure||"Flush");
+    if(p === "OPU") T.opu++; else if(p === "IVF") T.ivf++; else T.flush++;
+    T.rec += num(d.embryosRecovered); T.unf += num(d.unfertilized); T.deg += num(d.degenerated);
+    T.fresh += num(d.transferredFresh); T.frozen += num(d.frozen);
+    var k = r.camelTag;
+    if(!donors[k]) donors[k] = {n:0, rec:0, fresh:0, frozen:0};
+    donors[k].n++; donors[k].rec += num(d.embryosRecovered);
+    donors[k].fresh += num(d.transferredFresh); donors[k].frozen += num(d.frozen);
+  });
+
+  // pregnancy outcome per transfer: latest check on the recipient on/after transfer date
+  var preg = 0, open = 0, pend = 0;
+  transfers.forEach(function(t){
+    var later = checks.filter(function(c){
+      return c.camelTag === t.recipient && dayOf(c.data.date) >= t.date;
+    }).sort(function(a,b){ return dayOf(b.data.date).localeCompare(dayOf(a.data.date)); });
+    var res = later.length ? later[0].data.result : "";
+    if(res === "Pregnant"){ t.status = "Pregnant"; preg++; }
+    else if(res === "Not pregnant"){ t.status = "Not pregnant"; open++; }
+    else { t.status = later.length ? "Uncertain" : "Awaiting check"; pend++; }
+    t.checkDate = later.length ? dayOf(later[0].data.date) : "";
+  });
+
+  var totalFlushes = flushes.length;
+  var html = '<a class="backlink" href="#/">← Camels</a><h1>🧬 Embryo program</h1>';
+  html += '<div class="filters">';
+  PERIODS.forEach(function(p){
+    html += '<button data-p="'+p.key+'" class="'+(period===p.key?'active':'')+'">'+p.label+'</button>';
+  });
+  html += '</div>';
+
+  html += '<div class="stats">'
+    + stat(totalFlushes, "Flushes / OPU")
+    + stat(T.rec, "Embryos recovered")
+    + stat(totalFlushes ? (T.rec/totalFlushes).toFixed(1) : "–", "Embryos per flush")
+    + stat(T.fresh, "Transferred fresh")
+    + stat(T.frozen, "Frozen / vitrified")
+    + stat(T.unf, "Unfertilized oocytes")
+    + stat(T.deg, "Degenerated")
+    + stat(T.opu, "OPU")
+    + stat(T.ivf, "IVF")
+    + '</div>';
+
+  html += '<h2>Pregnancy rate</h2><div class="stats">'
+    + stat(pct(preg, preg+open), "Pregnancy rate", true)
+    + stat(preg + " / " + (preg+open), "Pregnant / checked")
+    + stat(pend, "Awaiting result")
+    + '</div><p class="hint">Based on embryo transfer records and the recipient\'s latest pregnancy check on or after the transfer date. '
+    + transfers.length + ' transfer' + (transfers.length===1?'':'s') + ' in this period.</p>';
+
+  // per-donor
+  var dk = Object.keys(donors).sort(function(a,b){ return donors[b].rec - donors[a].rec; });
+  html += '<h2>By donor</h2>';
+  if(!dk.length){
+    html += '<p class="empty">No flushes recorded yet. Open a donor camel and tap Flush / OPU.</p>';
+  } else {
+    html += '<div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Donor</th><th>Flushes</th><th>Embryos</th><th>Per flush</th><th>Fresh</th><th>Frozen</th></tr></thead><tbody>';
+    dk.forEach(function(k){
+      var d = donors[k];
+      html += '<tr><td><a href="#/k/'+encodeURIComponent(k)+'">'+esc(nameOf[k]||k)+'</a></td><td>'+d.n+'</td><td>'+d.rec+'</td><td>'+(d.rec/d.n).toFixed(1)+'</td><td>'+d.fresh+'</td><td>'+d.frozen+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // per flush
+  html += '<h2>Flushes</h2>';
+  if(!flushes.length){
+    html += '<p class="empty">No flushes in this period.</p>';
+  } else {
+    flushes.forEach(function(r){
+      var d = r.data;
+      html += '<div class="card record cat-flush"><span class="label">🥚 '+esc(d.procedure||"Flush")+' · <a href="#/k/'+encodeURIComponent(r.camelTag)+'">'+esc(nameOf[r.camelTag]||r.camelTag)+'</a></span>'
+        + '<div class="kv"><b>'+fmtDate(d.date)+'</b>'+(d.vet?' &nbsp;'+esc(d.vet):'')+'</div>'
+        + '<div class="kv">Recovered <b>'+num(d.embryosRecovered)+'</b> &nbsp; Fresh <b>'+num(d.transferredFresh)+'</b> &nbsp; Frozen <b>'+num(d.frozen)+'</b> &nbsp; UFO <b>'+num(d.unfertilized)+'</b> &nbsp; Degen. <b>'+num(d.degenerated)+'</b></div>'
+        + (d.recipients ? '<div class="kv">Recipients: '+esc(d.recipients)+'</div>' : '')
+        + '</div>';
+    });
+  }
+
+  // transfers
+  html += '<h2>Transfers and results</h2>';
+  if(!transfers.length){
+    html += '<p class="empty">No embryo transfers in this period.</p>';
+  } else {
+    html += '<div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Recipient</th><th>Transfer</th><th>Donor</th><th>Result</th></tr></thead><tbody>';
+    transfers.forEach(function(t){
+      var cls = t.status === "Pregnant" ? "st-preg" : (t.status === "Not pregnant" ? "st-open" : "st-pend");
+      var donorTag = tagFromText(t.r.data.donor);
+      var donorTxt = donorTag ? (nameOf[donorTag]||donorTag) : (t.r.data.donor||"");
+      html += '<tr><td><a href="#/k/'+encodeURIComponent(t.recipient)+'">'+esc(nameOf[t.recipient]||t.recipient)+'</a></td>'
+        + '<td>'+fmtDate(t.date)+'</td><td>'+esc(donorTxt)+'</td>'
+        + '<td class="'+cls+'">'+esc(t.status)+(t.checkDate?'<br><small style="font-weight:400;color:var(--muted)">'+fmtDate(t.checkDate)+'</small>':'')+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  app.innerHTML = html;
+  document.querySelectorAll(".filters button").forEach(function(b){
+    b.addEventListener("click", function(){ go("#/embryo/"+b.getAttribute("data-p")); });
+  });
+}
+function stat(n, t, hl){
+  return '<div class="stat'+(hl?' hl':'')+'"><span class="n">'+esc(n)+'</span><span class="t">'+esc(t)+'</span></div>';
+}
+
+// ---------- router ----------
+async function render(){
+  if(pinShown) return;
+  var hash = window.location.hash.replace(/^#/,"") || "/";
+  if(hash.charAt(0) !== "/"){ window.location.replace("#/k/" + encodeURIComponent(decodeURIComponent(hash))); return; }
+  var parts = hash.split("/").filter(Boolean);
+  try{
+    if(parts.length === 0){
+      await viewHome();
+    } else if(parts[0] === "embryo"){
+      await viewEmbryoDashboard(parts[1] || "all");
+    } else if(parts[0] === "reminders"){
+      await viewReminders();
+    } else if(parts[0] === "k" && parts[1]){
+      var rawTag = decodeURIComponent(parts[1]);
+      var tag = cleanTag(rawTag);
+      if(!tag){ await viewHome(); return; }
+      if(tag !== rawTag){ parts[1] = encodeURIComponent(tag); window.location.replace("#/" + parts.join("/")); return; }
+      if(parts[2] !== "new"){
+        var canon = await api("resolveTag", {tag: tag});
+        if(canon && canon !== tag){ parts[1] = encodeURIComponent(canon); window.location.replace("#/" + parts.join("/")); return; }
+      }
+      if(parts[2] === "new") await viewNewCamel(tag);
+      else if(parts[2] === "edit") await viewCamelEdit(tag);
+      else if(parts[2] === "history") await viewCamelHistory(tag, parts[3] || null);
+      else if(parts[2] === "photo") await viewPhotoForm(tag);
+      else if(parts[2] === "f" && parts[3]) await viewRecordForm(tag, parts[3]);
+      else await viewCamelDashboard(tag);
+    } else {
+      await viewHome();
+    }
+  }catch(e){
+    if(pinShown || (e && e.message === "PIN required")) return;
+    app.innerHTML = '<div class="flash">Something went wrong: '+esc(e && e.message ? e.message : String(e))+'</div><p><a href="#/">← Back to home</a></p>';
+  }
+}
+
+window.addEventListener("hashchange", render);
+
+(async function boot(){
+  await initCaps();
+  try{ await api("ping"); }catch(e){ if(pinShown) return; }
+  setWho();
+  render();
+})();
+
+})();
 </script>
 </body>
 </html>
