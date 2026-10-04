@@ -2,16 +2,18 @@
 const crypto = require("crypto");
 
 // ---------- environment (accepts several variable names) ----------
-function findEnv(exactNames, test) {
-  for (const n of exactNames) if (process.env[n]) return String(process.env[n]).trim();
+const ENV_USED = {};
+function findEnv(label, exactNames, test) {
+  for (const n of exactNames) if (process.env[n]) { ENV_USED[label] = n; return String(process.env[n]).trim(); }
   const k = Object.keys(process.env).find((key) => test(key.toLowerCase()));
+  ENV_USED[label] = k || null;
   return k ? String(process.env[k]).trim() : "";
 }
-const SB_URL = findEnv(["SUPABASE_URL", "supabase"], (l) => l.includes("supabase") && l.includes("url")).replace(/\/+$/, "");
-const SB_KEY = findEnv(["SUPABASE_SECRET_KEY", "supabase_secret_key", "SUPABASE_SERVICE_ROLE_KEY"],
+const SB_URL = findEnv("url", ["SUPABASE_URL", "supabase"], (l) => l.includes("supabase") && l.includes("url")).replace(/\/+$/, "");
+const SB_KEY = findEnv("key", ["SUPABASE_SECRET_KEY", "supabase_secret_key", "SUPABASE_SERVICE_ROLE_KEY"],
   (l) => l.includes("supabase") && (l.includes("secret") || l.includes("service")));
-const APP_PIN = findEnv(["APP_PIN", "app_pin", "PIN", "pin"], (l) => l.includes("pin") && !l.startsWith("vercel"));
-const ANTHROPIC_KEY = findEnv(["ANTHROPIC_API_KEY", "anthropic_api_key"], (l) => l.includes("anthropic"));
+const APP_PIN = findEnv("pin", ["APP_PIN", "app_pin", "PIN", "pin"], (l) => l.includes("pin") && !l.startsWith("vercel"));
+const ANTHROPIC_KEY = findEnv("anthropic", ["ANTHROPIC_API_KEY", "anthropic_api_key"], (l) => l.includes("anthropic"));
 
 const COOKIE = "kk_session";
 const BUCKET = "photos";
@@ -176,6 +178,23 @@ module.exports = async (req, res) => {
       const url = new URL(req.url, "http://x");
       const photo = url.searchParams.get("photo");
       if (photo) return servePhoto(req, res, photo);
+      if (url.searchParams.get("diag")) {
+        if (!isAuthed(req)) return send(401, { error: "Open the app and enter the PIN first." });
+        let test = null;
+        try {
+          const r = await fetch(SB_URL + "/rest/v1/camels?select=tag&limit=1", { headers: sbHeaders() });
+          test = r.status + " " + (await r.text()).slice(0, 120);
+        } catch (e) { test = "fetch failed: " + e.message; }
+        return send(200, {
+          variables_used: ENV_USED,
+          supabase_url: SB_URL,
+          key_starts_with: SB_KEY.slice(0, 8),
+          key_length: SB_KEY.length,
+          key_has_spaces: /\s/.test(SB_KEY),
+          all_supabase_variable_names: Object.keys(process.env).filter((k) => k.toLowerCase().includes("supabase")),
+          database_test: test,
+        });
+      }
       return send(200, { ok: true });
     }
     if (req.method !== "POST") return send(405, { error: "Method not allowed" });
