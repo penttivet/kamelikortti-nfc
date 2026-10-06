@@ -1,1 +1,187 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kamelikortti – QR stickers</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐫</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  :root { --sand:#EDE3CF; --card:#FBF8F2; --ink:#2B2620; --muted:#6E6250; --btn:#3F5B4A; --line:#D9CDB4; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--sand); color:var(--ink); font-family:-apple-system,"Helvetica Neue",Arial,sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { margin: 6px 0 4px; font-size: 1.7rem; }
+  .meta { color: var(--muted); margin: 0 0 16px; }
+  a { color: var(--btn); }
+  .panel { background: var(--card); border:1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  label { font-size: .9rem; color: var(--muted); }
+  input, select { font: inherit; padding: 9px 10px; border:1px solid var(--line); border-radius: 10px; background:#fff; color:var(--ink); }
+  input[type=number] { width: 84px; }
+  button { font: inherit; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--btn); background: #fff; color: var(--btn); cursor: pointer; }
+  button.primary { background: var(--btn); color: #fff; }
+  .list { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 6px; margin-top: 10px; }
+  .list label { display:flex; gap:8px; align-items:center; color: var(--ink); font-size: 1rem; padding: 6px 4px; }
+  .msg { padding: 14px; border-radius: 12px; background: #F3E2DC; color:#7A2E1F; }
+
+  /* stickers */
+  .sheet { display:grid; gap: 6mm; grid-template-columns: repeat(var(--cols,3), 1fr); }
+  .sticker { background:#fff; border: 1px dashed #b9ad95; border-radius: 3mm; padding: 4mm; text-align:center; break-inside: avoid; page-break-inside: avoid; }
+  .sticker svg { width: 100%; height: auto; display:block; margin: 0 auto 2mm; }
+  .sticker .name { font-weight: 700; font-size: var(--fs,13pt); line-height:1.15; word-break: break-word; }
+  .sticker .code { font-family: ui-monospace, Menlo, monospace; font-size: calc(var(--fs,13pt) * .8); color:#333; margin-top: 1mm; }
+  .sticker .hint { font-size: calc(var(--fs,13pt) * .6); color:#666; margin-top: 1mm; }
+
+  @media print {
+    @page { size: A4; margin: 10mm; }
+    body { background:#fff; }
+    .noprint { display:none !important; }
+    .wrap { padding:0; max-width:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="noprint">
+    <a href="/">← Kamelikortti</a>
+    <h1>QR stickers</h1>
+    <p class="meta">Each sticker opens the camel's page, just like the NFC tag. Pick camels, choose a size and press Print.</p>
+    <div id="status"></div>
+
+    <div class="panel" id="pickPanel" style="display:none">
+      <div class="row" style="justify-content:space-between">
+        <strong>Camels</strong>
+        <div class="row">
+          <button type="button" id="allBtn">Select all</button>
+          <button type="button" id="noneBtn">Select none</button>
+        </div>
+      </div>
+      <div class="list" id="camelList"></div>
+    </div>
+
+    <div class="panel">
+      <strong>Extra codes for new tags</strong>
+      <p class="meta" style="margin:6px 0 10px">Makes stickers for camels not added yet, e.g. camel005 – camel020. Scanning one opens the New camel form.</p>
+      <div class="row">
+        <label>Prefix <input id="prefix" value="camel" style="width:110px"></label>
+        <label>From <input id="from" type="number" min="0" value="1"></label>
+        <label>To <input id="to" type="number" min="0" value="0"></label>
+        <label>Digits <input id="digits" type="number" min="1" max="6" value="3"></label>
+      </div>
+    </div>
+
+    <div class="panel row">
+      <label>Size
+        <select id="size">
+          <option value="4">Small – 4 per row</option>
+          <option value="3" selected>Medium – 3 per row</option>
+          <option value="2">Large – 2 per row</option>
+        </select>
+      </label>
+      <button type="button" id="makeBtn">Show stickers</button>
+      <button type="button" class="primary" id="printBtn">Print</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+var APP_URL = "https://kamelikortti-nfc.vercel.app";
+var BASE = APP_URL + "/#";
+var ON_APP = location.protocol === "https:" && location.hostname === "kamelikortti-nfc.vercel.app";
+var camels = [];
+var statusEl = document.getElementById("status");
+var listEl = document.getElementById("camelList");
+var sheetEl = document.getElementById("sheet");
+
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+function qrSvg(text){
+  var qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+  var n = qr.getModuleCount(), m = 2, size = n + m * 2, d = "";
+  for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) d += "M" + (c + m) + " " + (r + m) + "h1v1h-1z";
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>';
+}
+
+async function loadCamels(){
+  if (!ON_APP) {
+    statusEl.innerHTML = '<div class="msg">To include your camels, open this page at <a href="' + APP_URL + '/qr.html">kamelikortti-nfc.vercel.app/qr.html</a>. You can still make stickers for new codes below.</div>';
+    makeSheet();
+    return;
+  }
+  statusEl.innerHTML = '<p class="meta">Loading camels…</p>';
+  try {
+    var r = await fetch("/api/app", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ action:"listCamels" }) });
+    if (r.status === 401) {
+      statusEl.innerHTML = '<div class="msg">Open <a href="/">Kamelikortti</a> first and enter the PIN, then come back to this page.</div>';
+      return;
+    }
+    var j = await r.json();
+    if (!r.ok) throw new Error(j.error || ("Error " + r.status));
+    camels = (j.result || []).filter(function(c){ return c && c.tag; });
+    statusEl.innerHTML = camels.length ? "" : '<p class="meta">No camels yet. You can still make stickers for new codes below.</p>';
+    if (camels.length) {
+      document.getElementById("pickPanel").style.display = "";
+      listEl.innerHTML = camels.map(function(c, i){
+        return '<label><input type="checkbox" checked data-i="' + i + '"> ' + esc(c.name || "(no name)") + ' <span class="meta" style="margin:0">' + esc(c.tag) + '</span></label>';
+      }).join("");
+    }
+    makeSheet();
+  } catch (e) {
+    statusEl.innerHTML = '<div class="msg">Could not load camels: ' + esc(e.message) + '</div>';
+  }
+}
+
+function extraCodes(){
+  var prefix = document.getElementById("prefix").value.trim().replace(/\s+/g, "");
+  var from = parseInt(document.getElementById("from").value, 10);
+  var to = parseInt(document.getElementById("to").value, 10);
+  var digits = Math.max(1, Math.min(6, parseInt(document.getElementById("digits").value, 10) || 1));
+  if (isNaN(from) || isNaN(to) || to < from) return [];
+  if (to - from > 300) to = from + 300;
+  var known = {};
+  camels.forEach(function(c){ known[String(c.tag).toLowerCase()] = true; });
+  var out = [];
+  for (var i = from; i <= to; i++) {
+    var code = prefix + String(i).padStart(digits, "0");
+    if (!known[code.toLowerCase()]) out.push({ tag: code, name: "" });
+  }
+  return out;
+}
+
+function makeSheet(){
+  var cols = document.getElementById("size").value;
+  sheetEl.style.setProperty("--cols", cols);
+  sheetEl.style.setProperty("--fs", cols === "2" ? "16pt" : cols === "3" ? "13pt" : "10pt");
+  var chosen = [];
+  listEl.querySelectorAll("input[type=checkbox]").forEach(function(cb){ if (cb.checked) chosen.push(camels[+cb.getAttribute("data-i")]); });
+  chosen = chosen.concat(extraCodes());
+  if (!chosen.length) { sheetEl.innerHTML = '<p class="meta noprint">Nothing selected.</p>'; return; }
+  sheetEl.innerHTML = chosen.map(function(c){
+    return '<div class="sticker">' + qrSvg(BASE + encodeURIComponent(c.tag)) +
+      '<div class="name">' + (c.name ? esc(c.name) : "&nbsp;") + '</div>' +
+      '<div class="code">' + esc(c.tag) + '</div>' +
+      '<div class="hint">Scan for camel record</div></div>';
+  }).join("");
+}
+
+document.getElementById("allBtn").addEventListener("click", function(){ listEl.querySelectorAll("input").forEach(function(cb){ cb.checked = true; }); makeSheet(); });
+document.getElementById("noneBtn").addEventListener("click", function(){ listEl.querySelectorAll("input").forEach(function(cb){ cb.checked = false; }); makeSheet(); });
+document.getElementById("makeBtn").addEventListener("click", makeSheet);
+document.getElementById("printBtn").addEventListener("click", function(){ makeSheet(); setTimeout(function(){ window.print(); }, 100); });
+listEl.addEventListener("change", makeSheet);
+["prefix","from","to","digits","size"].forEach(function(id){ document.getElementById(id).addEventListener("change", makeSheet); });
+
+if (typeof qrcode === "undefined") {
+  statusEl.innerHTML = '<div class="msg">The QR generator could not load. Check the internet connection and reload the page.</div>';
+} else {
+  loadCamels();
+}
+</script>
+</body>
+</html>
